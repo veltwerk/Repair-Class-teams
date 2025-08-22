@@ -54,6 +54,7 @@ Write-Host "Connection successful." -ForegroundColor Green
 $user = Get-MgUser -UserId $TeamsAdmin
 $ownerId = $user.Id
 
+
 # -------------------------------
 # Teams ophalen en filteren
 # -------------------------------
