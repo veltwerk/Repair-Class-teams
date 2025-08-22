@@ -1,6 +1,10 @@
 # Repair-Class-teams
 
-Fixes Class Teams that were created using the deprecated teams templates. Ref: [Classwork, Assignment Import/upload attachment file issue.](https://learn.microsoft.com/en-us/answers/questions/5508367/classwork-assignment-import-upload-attachment-file)
+Fixes Class Teams that were created using the deprecated teams templates. 
+Ref: [Classwork, Assignment Import/upload attachment file issue.](https://learn.microsoft.com/en-us/answers/questions/5508367/classwork-assignment-import-upload-attachment-file)
+
+- Sjoerd Derks : s.derks@veldwerk.nl
+- Michiel In 't Velt : m.intvelt@veldwerk.nl
 
 ## disclaimer
 
