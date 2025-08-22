@@ -4,7 +4,7 @@ Fixes Class Teams that were created using the deprecated teams teamplates.
 
 ## disclaimer
 
-Please be carefull when using this script. It add permissions to the team's Sharepoint site for several educational apps. This script was created and tested in a very short time, so the regular caveats apply: use it at your own risk.
+Please be carefull when using this script. It add permissions to the team's Sharepoint site for several educational apps. This script was created and tested in a very short time, without much error handling so the regular caveats apply: use it at your own risk.
 
 ## What the script is for
 
@@ -23,7 +23,7 @@ The powershell script uses the graph API to help you select the Teams that need 
 - It will ask you for a search term that will be used to filter on the ``mailNickname`` field
 - A gridView is used to select the filtered teams you want fixed
 - The admin account will be made owner of each team
-- the following apps will get permissions on the teams Sharepoint site
+- the following apps will get ``Full Control`` permissions on the teams Sharepoint site
 
 
 | Name                  | App Id                                |
@@ -34,3 +34,4 @@ The powershell script uses the graph API to help you select the Teams that need 
 | EDU Teams Files       | 2d4d3d8e-2be3-4bef-9f87-7875a61c29de  |
 | EDU Teams Calendar    | 8f348934-64be-4bb2-bc16-c54c96789f43  |
 
+When finished a CSV with the repaired teams is written and opened.
