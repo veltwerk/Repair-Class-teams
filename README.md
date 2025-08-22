@@ -24,11 +24,13 @@ The powershell script uses the graph API to help you select the Teams that need 
 - A gridView is used to select the filtered teams you want fixed
 - The admin account will be made owner of each team
 - the following apps will get permissions on the teams Sharepoint site
-| Name   | App Id   |
-| -------------------- | ------------------------------------ |
-| EDU Teams Assignment | 22d27567-b3f0-4dc2-9ec2-46ed368ba538 |
-| EDU Teams Notebook | c9a559d2-7aab-4f13-a6ed-e7e9c52aec87 |
-| EDU OneNote | 13291f5a-59ac-4c59-b0fa-d1632e8f3292 |
-| EDU Teams Files | 2d4d3d8e-2be3-4bef-9f87-7875a61c29de |
-| EDU Teams Calendar | 8f348934-64be-4bb2-bc16-c54c96789f43 |
+
+
+| Name                  | App Id                                |
+| --------------------- | ------------------------------------- |
+| EDU Teams Assignment  | 22d27567-b3f0-4dc2-9ec2-46ed368ba538  |
+| EDU Teams Notebook    | c9a559d2-7aab-4f13-a6ed-e7e9c52aec87  |
+| EDU OneNote           | 13291f5a-59ac-4c59-b0fa-d1632e8f3292  |
+| EDU Teams Files       | 2d4d3d8e-2be3-4bef-9f87-7875a61c29de  |
+| EDU Teams Calendar    | 8f348934-64be-4bb2-bc16-c54c96789f43  |
 
