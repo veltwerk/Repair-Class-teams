@@ -1,6 +1,9 @@
+<#
 # ============================================
 # Bulk Repair Script for EDU Teams Notebooks V1.0
 # ============================================
+# S.derks@veldwerk.nl & m.intvelt@veldwerk.nl
+#>
 
 Write-Host "This script repairs the Notebook Classroom in Educational Teams groups in bulk." -ForegroundColor Yellow
 $TeamsAdmin = Read-Host "Enter the UPN of a licensed Teams Admin"
