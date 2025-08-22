@@ -2,8 +2,8 @@
 # Bulk Repair Script for EDU Teams Notebooks V1.0
 # ============================================
 
-Write-Host "Dit script repareert in bulk de Notebook Classroom in Educatieve Teams groepen." -ForegroundColor Yellow
-$TeamsAdmin = Read-Host "Geef de UPN op van een Teams Admin met licentie"
+Write-Host "This script repairs the Notebook Classroom in Educational Teams groups in bulk." -ForegroundColor Yellow
+$TeamsAdmin = Read-Host "Enter the UPN of a licensed Teams Admin"
 # -------------------------------
 # Functie: Module installeren en importeren
 # -------------------------------
@@ -12,14 +12,14 @@ function Ensure-GraphModule {
         [string]$ModuleName
     )
     if (-not(Get-InstalledModule $ModuleName -ErrorAction SilentlyContinue)) {
-        Write-Host "Installeren van module $ModuleName..." -ForegroundColor Yellow
+        Write-Host "Installing module $ModuleName..." -ForegroundColor Yellow
         Install-Module $ModuleName -Confirm:$false -Force -Scope CurrentUser -AllowClobber
     }
     if (-not(Get-Module $ModuleName -ErrorAction SilentlyContinue)) {
-        Write-Host "Importeren van module $ModuleName..." -ForegroundColor Yellow
+        Write-Host "Importing module $ModuleName..." -ForegroundColor Yellow
         Import-Module $ModuleName
     }
-    Write-Host "$ModuleName is klaar voor gebruik." -ForegroundColor Green
+    Write-Host "$ModuleName is ready to use." -ForegroundColor Green
 }
 
 # -------------------------------
@@ -37,15 +37,15 @@ foreach ($module in $modules) {
 # -------------------------------
 # Verbinding maken met Graph
 # -------------------------------
-Write-Host "Verbinding maken met tenant..." -ForegroundColor Yellow
+Write-Host "Connecting to tenant..." -ForegroundColor Yellow
 
 #Disconnect any existing sessions
-$Logout = Disconnect-MgGraph -ErrorAction SilentlyContinue
+Disconnect-MgGraph -ErrorAction SilentlyContinue > $null
 Remove-Item "$env:USERPROFILE\.mgcontext" -Force -ErrorAction SilentlyContinue
 
 # Connect to Microsoft Graph with required scopes
 Connect-MgGraph -Scopes "Sites.FullControl.All","Group.ReadWrite.All","User.Read.All"
-Write-Host "Verbinding succesvol." -ForegroundColor Green
+Write-Host "Connection successful." -ForegroundColor Green
 
 # -------------------------------
 # Teams Admin ophalen
@@ -62,32 +62,32 @@ $AllTeams = Get-MgGroup -All | Where-Object {
     $_.Visibility -eq "HiddenMembership"
 } | Select-Object -Property DisplayName, MailNickname, Id
 
-Write-host ("{0} teams gevonden." -f $AllTeams.Count)
+Write-host ("{0} teams found." -f $AllTeams.Count)
 
 $allDone = $false
 while (!$allDone) {
-    Write-Host "Geef een zoekterm op om de teams te filteren; Bijvoorbeeld '2526-' of 'klas'." -ForegroundColor Yellow
-    Write-Host "Druk op <ENTER> om het script te beeindigen." -ForegroundColor Yellow
-    $queryGroups = Read-Host "Zoekterm: "
+    Write-Host "Enter a search term to filter the mailnickname of the teams; for example '2526-' or 'class'." -ForegroundColor Yellow
+    Write-Host "Press <ENTER> to exit the script." -ForegroundColor Yellow
+    $queryGroups = Read-Host "Search term: "
     if ($queryGroups -eq "") {
-        Write-host "Script wordt beeindigd."
+        Write-host "Script is ending."
         $allDone = $true
     } else {
         $queriedGroups = $AllTeams | Where-Object { $_.MailNickname -like "*$queryGroups*" }
         if ($queriedGroups.Count -eq 0) {
-            Write-Host "Geen Teams gevonden voor de opgegeven query." -ForegroundColor Red
+            Write-Host "No Teams found for the given query." -ForegroundColor Red
         } else {
-            Write-Host "Selecteer de Teams die gerepareerd moeten worden via Out-GridView." -ForegroundColor Yellow
+            Write-Host "Select the Teams to repair via Out-GridView." -ForegroundColor Yellow
 
             $selectedGroups = $queriedGroups | Out-GridView -OutputMode Multiple
             $groupCount = $selectedGroups.Count
 
             # -------------------------------
-            # Tijdelijk eigenaar toevoegen
+            # Temporarily add owner
             # -------------------------------
             foreach ($team in $selectedGroups) {
                 $progress = ($selectedGroups.IndexOf($team) / $groupCount) * 100
-                Write-Progress -Activity "Teams Owner toevoegen" -Status "Toevoegen aan $($team.DisplayName)" -PercentComplete $progress
+                Write-Progress -Activity "Adding Teams Owner" -Status "Adding to $($team.DisplayName)" -PercentComplete $progress
 
                 $newGroupOwner = @{
                     "@odata.id" = "https://graph.microsoft.com/v1.0/users/$ownerId"
@@ -99,7 +99,7 @@ while (!$allDone) {
             }
 
             # -------------------------------
-            # EDU App permissies instellen
+            # Set EDU App permissions
             # -------------------------------
             $eduApps = @(
                 @{ id = "22d27567-b3f0-4dc2-9ec2-46ed368ba538"; name = "EDU Teams Assignment" },
@@ -111,7 +111,7 @@ while (!$allDone) {
 
             foreach ($team in $selectedGroups) {
                 $progress = ($selectedGroups.IndexOf($team) / $groupCount) * 100
-                Write-Progress -Activity "Permissies instellen" -Status "Voor $($team.DisplayName)" -PercentComplete $progress
+                Write-Progress -Activity "Setting permissions" -Status "For $($team.DisplayName)" -PercentComplete $progress
 
                 $site = Invoke-MgGraphRequest -Method GET -Uri "https://graph.microsoft.com/v1.0/groups/$($team.Id)/sites/root"
 
@@ -126,17 +126,17 @@ while (!$allDone) {
                             })
                     }
 
-                    Write-Host "Permissies instellen voor $($app.name) op $($team.DisplayName)" -ForegroundColor Cyan
+                    Write-Host "Setting permissions for $($app.name) on $($team.DisplayName)" -ForegroundColor Cyan
                     $Result = Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/v1.0/sites/$($site.id)/permissions" -Body $body
                 }
 
-                # Tijdelijke eigenaar verwijderen
-                Write-Host "Verwijderen van $($user.DisplayName) als eigenaar van $($team.DisplayName)"
+                # Remove temporary owner
+                Write-Host "Removing $($user.DisplayName) as owner of $($team.DisplayName)"
                 Remove-MgGroupOwnerByRef -GroupId $team.Id -DirectoryObjectId $ownerId -ErrorAction SilentlyContinue
             }
 
             # -------------------------------
-            # Exporteren naar CSV
+            # Export to CSV
             # -------------------------------
             $selectedGroups | Select-Object DisplayName, Id, MailNickname | Export-Csv -Path "$HOME\Repaired-Teams.csv" -NoTypeInformation
             Invoke-Item -Path "$HOME\Repaired-Teams.csv"
